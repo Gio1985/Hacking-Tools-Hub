@@ -1,591 +1,391 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NMAP - Network Mapper</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hacking Tools Hub</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Courier New", monospace;
+        background: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 100%);
+        color: #e0e0e0;
+        min-height: 100vh;
+        padding: 2rem;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #00d9ff;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        color: #00d9ff;
+        text-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+        margin-bottom: 0.5rem;
+        letter-spacing: 2px;
+      }
+
+      .subtitle {
+        font-size: 1rem;
+        color: #a0a0a0;
+        font-style: italic;
+      }
+
+      .description {
+        background: rgba(0, 217, 255, 0.05);
+        border-left: 4px solid #00d9ff;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        border-radius: 4px;
+        line-height: 1.6;
+        font-size: 0.9rem;
+      }
+
+      .search-container {
+        margin-bottom: 2rem;
+      }
+
+      .search-box {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        background: rgba(0, 217, 255, 0.05);
+        border: 1px solid #2a3f5f;
+        border-radius: 6px;
+        color: #e0e0e0;
+        font-family: "Courier New", monospace;
+        font-size: 0.9rem;
+        transition: all 0.3s;
+      }
+
+      .search-box:focus {
+        outline: none;
+        border-color: #00d9ff;
+        box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
+      }
+
+      .search-box::placeholder {
+        color: #666;
+      }
+
+      .tools-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .tool-card {
+        background: linear-gradient(145deg, #1a1f2e, #0f1419);
+        border: 1px solid #2a3f5f;
+        border-radius: 6px;
+        padding: 1rem 1.5rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .tool-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(0, 217, 255, 0.1),
+          transparent
+        );
+        transition: left 0.5s;
+      }
+
+      .tool-card:hover::before {
+        left: 100%;
+      }
+
+      .tool-card:hover {
+        transform: translateX(5px);
+        border-color: #00d9ff;
+        box-shadow: 0 2px 15px rgba(0, 217, 255, 0.3);
+      }
+
+      .tool-icon {
+        font-size: 2rem;
+        flex-shrink: 0;
+      }
+
+      .tool-info {
+        flex-grow: 1;
+      }
+
+      .tool-name {
+        font-size: 1.1rem;
+        color: #00d9ff;
+        margin-bottom: 0.3rem;
+        font-weight: bold;
+      }
+
+      .tool-description {
+        color: #a0a0a0;
+        font-size: 0.85rem;
+        line-height: 1.4;
+      }
+
+      .badge {
+        display: inline-block;
+        background: #00d9ff;
+        color: #0a0e1a;
+        padding: 0.15rem 0.5rem;
+        border-radius: 10px;
+        font-size: 0.65rem;
+        font-weight: bold;
+        margin-left: 0.5rem;
+      }
+
+      .badge-soon {
+        background: #666;
+      }
+
+      .arrow {
+        color: #00d9ff;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+        transition: transform 0.3s;
+      }
+
+      .tool-card:hover .arrow {
+        transform: translateX(5px);
+      }
+
+      .coming-soon {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .no-results {
+        text-align: center;
+        padding: 2rem;
+        color: #666;
+        font-style: italic;
+        display: none;
+      }
+
+      footer {
+        text-align: center;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        border-top: 1px solid #2a3f5f;
+        color: #666;
+        font-size: 0.85rem;
+      }
+
+      @media (max-width: 768px) {
+        h1 {
+          font-size: 1.8rem;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
-            color: #e0e0e0;
-            line-height: 1.6;
-            padding: 20px;
+        .tool-card {
+          flex-direction: column;
+          align-items: flex-start;
+          padding: 1rem;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: rgba(22, 27, 34, 0.8);
-            border-radius: 12px;
-            padding: 40px;
-            box-shadow: 0 8px 32px rgba(0, 255, 157, 0.1);
+        .arrow {
+          display: none;
         }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 2px solid #00ff9d;
-            padding-bottom: 20px;
-        }
-
-        .header h1 {
-            font-size: 3em;
-            color: #00ff9d;
-            margin-bottom: 10px;
-            text-shadow: 0 0 20px rgba(0, 255, 157, 0.5);
-        }
-
-        .header .subtitle {
-            font-size: 1.1em;
-            color: #8b949e;
-        }
-
-        .objective {
-            background: linear-gradient(135deg, #1e3a4f 0%, #2d4a5f 100%);
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            border-left: 4px solid #00ff9d;
-        }
-
-        .section {
-            margin-bottom: 35px;
-        }
-
-        .section-title {
-            font-size: 1.8em;
-            color: #00d4ff;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .subsection {
-            margin-bottom: 25px;
-        }
-
-        .subsection-title {
-            font-size: 1.2em;
-            color: #ffa500;
-            margin-bottom: 10px;
-            padding-left: 10px;
-            border-left: 3px solid #ffa500;
-        }
-
-        .code-block {
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 15px;
-            margin: 10px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 0.95em;
-            overflow-x: auto;
-            position: relative;
-        }
-
-        .code-block code {
-            color: #00ff9d;
-        }
-
-        .code-block .comment {
-            color: #8b949e;
-            font-style: italic;
-        }
-
-        .copy-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #238636;
-            color: white;
-            border: none;
-            padding: 5px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.85em;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .code-block:hover .copy-btn {
-            opacity: 1;
-        }
-
-        .copy-btn:hover {
-            background: #2ea043;
-        }
-
-        .tip {
-            background: rgba(255, 165, 0, 0.1);
-            border-left: 4px solid #ffa500;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 4px;
-        }
-
-        .tip strong {
-            color: #ffa500;
-        }
-
-        .nav {
-            position: sticky;
-            top: 20px;
-            background: rgba(13, 17, 23, 0.95);
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border: 1px solid #30363d;
-        }
-
-        .nav a {
-            color: #58a6ff;
-            text-decoration: none;
-            display: block;
-            padding: 8px 12px;
-            border-radius: 4px;
-            transition: background 0.3s;
-            font-size: 0.95em;
-        }
-
-        .nav a:hover {
-            background: rgba(88, 166, 255, 0.1);
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin: 20px 0;
-        }
-
-        .card {
-            background: rgba(13, 17, 23, 0.6);
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #30363d;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0, 255, 157, 0.2);
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-            
-            .header h1 {
-                font-size: 2em;
-            }
-            
-            .section-title {
-                font-size: 1.5em;
-            }
-        }
-
-        .scroll-top {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #00ff9d;
-            color: #0f0f23;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 1.5em;
-            box-shadow: 0 4px 12px rgba(0, 255, 157, 0.4);
-            transition: all 0.3s;
-        }
-
-        .scroll-top:hover {
-            transform: scale(1.1);
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="header">
-            <h1>🎯 NMAP</h1>
-            <p class="subtitle">Network Mapper - Escáner de Red y Auditoría de Seguridad</p>
+      <header>
+        <h1>🎯 HACKING TOOLS HUB</h1>
+        <p class="subtitle">Repositorio de Documentación Técnica</p>
+      </header>
+
+      <div class="description">
+        <strong style="color: #00d9ff">Objetivo:</strong> Este repositorio
+        centraliza documentación práctica y referencia rápida de herramientas
+        esenciales para pentesting, auditoría de seguridad y análisis de
+        infraestructura. Cada herramienta incluye comandos, ejemplos y casos de
+        uso optimizados para trabajo real.
+      </div>
+
+      <div class="search-container">
+        <input
+          type="text"
+          id="searchBox"
+          class="search-box"
+          placeholder="🔍 Buscar herramienta..."
+        />
+      </div>
+
+      <div class="tools-list" id="toolsList">
+        <!-- NMAP -->
+        <div
+          class="tool-card"
+          onclick="window.location.href='tools/nmap.html'"
+          data-name="nmap network mapper escaner red puertos"
+        >
+          <div class="tool-icon">🎯</div>
+          <div class="tool-info">
+            <div class="tool-name">NMAP <span class="badge">ACTIVO</span></div>
+            <div class="tool-description">
+              Network Mapper - Escáner de red y auditoría de seguridad.
+              Identificación de hosts, puertos, servicios y vulnerabilidades.
+            </div>
+          </div>
+          <div class="arrow">→</div>
         </div>
 
-        <div class="objective">
-            <h3>🔍 Objetivo Principal</h3>
-            <p>NMAP permite identificar hosts activos, puertos abiertos, servicios en ejecución y posibles vulnerabilidades en una red. Es la herramienta esencial para reconocimiento y mapeo de infraestructuras.</p>
+        <!-- Template para futuras herramientas -->
+        <div
+          class="tool-card coming-soon"
+          data-name="metasploit framework exploit penetration"
+        >
+          <div class="tool-icon">🔍</div>
+          <div class="tool-info">
+            <div class="tool-name">
+              METASPLOIT <span class="badge badge-soon">PRÓXIMAMENTE</span>
+            </div>
+            <div class="tool-description">
+              Framework de explotación y desarrollo de exploits. Testing de
+              penetración y validación de vulnerabilidades.
+            </div>
+          </div>
+          <div class="arrow">→</div>
         </div>
 
-        <div class="section" id="puertos">
-            <h2 class="section-title">📡 Escaneos de Puertos</h2>
-            
-            <div class="subsection">
-                <h3 class="subsection-title">Escaneo SYN (Sigiloso)</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>nmap -sS &lt;target&gt;</code>
-                </div>
-                <p>Detecta puertos abiertos/cerrados sin completar el handshake TCP. Rápido y menos detectable.</p>
+        <div
+          class="tool-card coming-soon"
+          data-name="burp suite web proxy scanner aplicaciones"
+        >
+          <div class="tool-icon">⚡</div>
+          <div class="tool-info">
+            <div class="tool-name">
+              BURP SUITE <span class="badge badge-soon">PRÓXIMAMENTE</span>
             </div>
-
-            <div class="subsection">
-                <h3 class="subsection-title">Escaneo de puerto específico</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>nmap -p 80 &lt;target&gt;<br>
-nmap -p 80,443,8080 &lt;target&gt;<br>
-nmap -p 1-1000 &lt;target&gt;<br>
-nmap -p- &lt;target&gt;  <span class="comment"># Todos los puertos</span></code>
-                </div>
+            <div class="tool-description">
+              Plataforma integrada para testing de seguridad en aplicaciones
+              web. Proxy, scanner y herramientas de análisis.
             </div>
-
-            <div class="subsection">
-                <h3 class="subsection-title">Ver razón del estado del puerto</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>nmap --reason &lt;target&gt;</code>
-                </div>
-                <p>Muestra por qué NMAP determinó que un puerto está abierto, cerrado o filtrado.</p>
-            </div>
+          </div>
+          <div class="arrow">→</div>
         </div>
 
-        <div class="section" id="optimizacion">
-            <h2 class="section-title">⚡ Optimización de Escaneo</h2>
-            
-            <div class="grid">
-                <div class="card">
-                    <h3 class="subsection-title">Deshabilitar ping ICMP</h3>
-                    <div class="code-block">
-                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                        <code>nmap -Pn &lt;target&gt;</code>
-                    </div>
-                    <p>Asume que el host está activo, útil cuando el firewall bloquea ICMP.</p>
-                </div>
-
-                <div class="card">
-                    <h3 class="subsection-title">Anular resolución DNS</h3>
-                    <div class="code-block">
-                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                        <code>nmap -n &lt;target&gt;</code>
-                    </div>
-                    <p>No resuelve nombres de dominio, acelera el escaneo.</p>
-                </div>
-
-                <div class="card">
-                    <h3 class="subsection-title">Deshabilitar ARP ping</h3>
-                    <div class="code-block">
-                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                        <code>nmap --disable-arp-ping &lt;target&gt;</code>
-                    </div>
-                    <p>Útil en redes donde ARP está filtrado.</p>
-                </div>
-
-                <div class="card">
-                    <h3 class="subsection-title">Velocidad de escaneo</h3>
-                    <div class="code-block">
-                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                        <code>nmap -T5 &lt;target&gt;</code>
-                    </div>
-                    <p>Plantillas de tiempo: T0 (paranoico) a T5 (insano). T5 es agresivo y genera mucho ruido.</p>
-                </div>
+        <div
+          class="tool-card coming-soon"
+          data-name="john ripper password cracking hash contraseñas"
+        >
+          <div class="tool-icon">🔐</div>
+          <div class="tool-info">
+            <div class="tool-name">
+              JOHN THE RIPPER <span class="badge badge-soon">PRÓXIMAMENTE</span>
             </div>
+            <div class="tool-description">
+              Herramienta de cracking de contraseñas. Soporte para múltiples
+              formatos y algoritmos de hash.
+            </div>
+          </div>
+          <div class="arrow">→</div>
         </div>
 
-        <div class="section" id="servicios">
-            <h2 class="section-title">🔎 Detección de Servicios y Versiones</h2>
-            
-            <div class="subsection">
-                <h3 class="subsection-title">Detectar versiones de servicios</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>nmap -sV &lt;target&gt;</code>
-                </div>
-                <p>Identifica versión exacta del software corriendo en puertos abiertos.</p>
+        <div
+          class="tool-card coming-soon"
+          data-name="wireshark network sniffer protocolo trafico"
+        >
+          <div class="tool-icon">🌐</div>
+          <div class="tool-info">
+            <div class="tool-name">
+              WIRESHARK <span class="badge badge-soon">PRÓXIMAMENTE</span>
             </div>
-
-            <div class="subsection">
-                <h3 class="subsection-title">Detección de OS</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>nmap -O &lt;target&gt;</code>
-                </div>
-                <p>Intenta identificar el sistema operativo del objetivo.</p>
+            <div class="tool-description">
+              Analizador de protocolos de red. Captura y análisis detallado de
+              tráfico en tiempo real.
             </div>
-
-            <div class="subsection">
-                <h3 class="subsection-title">Escaneo agresivo (completo)</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>nmap -A &lt;target&gt;</code>
-                </div>
-                <p>Combina -sV, -O, scripts y traceroute.</p>
-            </div>
+          </div>
+          <div class="arrow">→</div>
         </div>
 
-        <div class="section" id="paquetes">
-            <h2 class="section-title">📦 Análisis de Paquetes</h2>
-            
-            <div class="subsection">
-                <h3 class="subsection-title">Traza de paquetes</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>nmap --packet-trace &lt;target&gt;</code>
-                </div>
-                <p>Muestra cada paquete enviado y recibido durante el escaneo.</p>
+        <div
+          class="tool-card coming-soon"
+          data-name="sqlmap injection sql database bases datos"
+        >
+          <div class="tool-icon">💉</div>
+          <div class="tool-info">
+            <div class="tool-name">
+              SQLMAP <span class="badge badge-soon">PRÓXIMAMENTE</span>
             </div>
+            <div class="tool-description">
+              Automatización de detección y explotación de vulnerabilidades SQL
+              injection. Testing de bases de datos.
+            </div>
+          </div>
+          <div class="arrow">→</div>
         </div>
+      </div>
 
-        <div class="section" id="evasion">
-            <h2 class="section-title">🛡️ Evasión de Firewalls</h2>
-            
-            <div class="subsection">
-                <h3 class="subsection-title">Flag ACK para evasión</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>nmap -sA &lt;target&gt;</code>
-                </div>
-                <p>Envía paquetes con flag ACK para identificar reglas de firewall.</p>
-            </div>
+      <div class="no-results" id="noResults">
+        No se encontraron herramientas que coincidan con tu búsqueda.
+      </div>
 
-            <div class="subsection">
-                <h3 class="subsection-title">Decoys (IPs señuelo)</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>nmap -D RND:5 &lt;target&gt;<br><br>
-nmap -D 192.168.1.5,192.168.1.10,ME &lt;target&gt;</code>
-                </div>
-                <p>Enmascara tu IP real generando IPs aleatorias como señuelo.</p>
-            </div>
-
-            <div class="subsection">
-                <h3 class="subsection-title">Cambiar puerto origen</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>nmap --source-port 53 &lt;target&gt;<br>
-nmap -g 80 &lt;target&gt;</code>
-                </div>
-                <p>Útil cuando firewalls permiten tráfico desde puertos específicos (DNS:53, HTTP:80).</p>
-            </div>
-
-            <div class="subsection">
-                <h3 class="subsection-title">Fragmentación de paquetes</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>nmap -f &lt;target&gt;</code>
-                </div>
-                <p>Divide paquetes para evadir IDS/IPS.</p>
-            </div>
-
-            <div class="subsection">
-                <h3 class="subsection-title">MTU personalizado</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>nmap --mtu 16 &lt;target&gt;</code>
-                </div>
-                <p>Define tamaño de fragmentación (múltiplo de 8).</p>
-            </div>
-
-            <div class="subsection">
-                <h3 class="subsection-title">Spoofing de MAC</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>nmap --spoof-mac 0 &lt;target&gt;</code>
-                </div>
-                <p>Genera MAC aleatoria. También acepta MAC específica o vendor.</p>
-            </div>
-        </div>
-
-        <div class="section" id="scripts">
-            <h2 class="section-title">📜 Scripts NSE (Nmap Scripting Engine)</h2>
-            
-            <div class="subsection">
-                <h3 class="subsection-title">Scripts por defecto</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>nmap -sC &lt;target&gt;</code>
-                </div>
-                <p>Ejecuta scripts seguros y útiles para detección común.</p>
-            </div>
-
-            <div class="subsection">
-                <h3 class="subsection-title">Detección de vulnerabilidades</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>nmap --script vuln &lt;target&gt;</code>
-                </div>
-                <p>Busca vulnerabilidades conocidas (CVEs).</p>
-            </div>
-
-            <div class="subsection">
-                <h3 class="subsection-title">Script específico</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>nmap --script http-title &lt;target&gt;</code>
-                </div>
-            </div>
-
-            <div class="subsection">
-                <h3 class="subsection-title">Múltiples scripts</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>nmap --script "http-*" &lt;target&gt;</code>
-                </div>
-            </div>
-
-            <div class="subsection">
-                <h3 class="subsection-title">Categorías de scripts</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>nmap --script auth &lt;target&gt;       <span class="comment"># Autenticación</span><br>
-nmap --script brute &lt;target&gt;      <span class="comment"># Fuerza bruta</span><br>
-nmap --script discovery &lt;target&gt;  <span class="comment"># Descubrimiento</span><br>
-nmap --script exploit &lt;target&gt;    <span class="comment"># Exploits</span></code>
-                </div>
-            </div>
-        </div>
-
-        <div class="section" id="exportacion">
-            <h2 class="section-title">📤 Exportación de Resultados</h2>
-            
-            <div class="grid">
-                <div class="card">
-                    <h3 class="subsection-title">Formato XML</h3>
-                    <div class="code-block">
-                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                        <code>nmap -oX scan.xml &lt;target&gt;</code>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3 class="subsection-title">Formato normal</h3>
-                    <div class="code-block">
-                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                        <code>nmap -oN scan.txt &lt;target&gt;</code>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3 class="subsection-title">Formato grepable</h3>
-                    <div class="code-block">
-                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                        <code>nmap -oG scan.gnmap &lt;target&gt;</code>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3 class="subsection-title">Todos los formatos</h3>
-                    <div class="code-block">
-                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                        <code>nmap -oA scan_completo &lt;target&gt;</code>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="section" id="combinaciones">
-            <h2 class="section-title">🔥 Combinaciones Útiles</h2>
-            
-            <div class="subsection">
-                <h3 class="subsection-title">Escaneo completo sigiloso</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>nmap -sS -sV -O -p- --script vuln -oA scan_full &lt;target&gt;</code>
-                </div>
-            </div>
-
-            <div class="subsection">
-                <h3 class="subsection-title">Escaneo rápido y agresivo</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>nmap -T4 -A -p- &lt;target&gt;</code>
-                </div>
-            </div>
-
-            <div class="subsection">
-                <h3 class="subsection-title">Escaneo evasivo completo</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>nmap -sS -Pn -n --disable-arp-ping -D RND:10 --source-port 53 -f --data-length 25 &lt;target&gt;</code>
-                </div>
-            </div>
-
-            <div class="subsection">
-                <h3 class="subsection-title">Escaneo de red con hosts activos</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>nmap -sn 192.168.1.0/24</code>
-                </div>
-            </div>
-        </div>
-
-        <div class="section" id="tproc">
-            <h2 class="section-title">🎨 TPROC - Conversión XML a HTML</h2>
-            
-            <div class="subsection">
-                <p><strong>Convierte reportes XML de NMAP en páginas HTML visuales.</strong></p>
-                
-                <h3 class="subsection-title">Instalación</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>git clone https://github.com/honze-net/nmap-bootstrap-xsl</code>
-                </div>
-
-                <h3 class="subsection-title">Uso</h3>
-                <div class="code-block">
-                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                    <code>xsltproc nmap-bootstrap.xsl scan.xml -o scan.html</code>
-                </div>
-                <p>Genera un reporte HTML responsivo y elegante con toda la información del escaneo NMAP.</p>
-            </div>
-        </div>
-
-        <div class="tip">
-            <strong>💡 Tip:</strong> Combina múltiples técnicas de evasión para pruebas de penetración realistas y siempre verifica que tengas autorización antes de escanear.
-        </div>
+      <footer>
+        <p>🛡️ Uso exclusivo para fines educativos y auditorías autorizadas</p>
+        <p style="margin-top: 0.5rem">
+          Powered by GitHub Pages | Última actualización: Octubre 2025
+        </p>
+      </footer>
     </div>
 
-    <div class="scroll-top" id="scrollTop" onclick="scrollToTop()">↑</div>
-
     <script>
-        function copyCode(button) {
-            const codeBlock = button.parentElement;
-            const code = codeBlock.querySelector('code').innerText;
-            navigator.clipboard.writeText(code).then(() => {
-                button.textContent = '✓ Copiado';
-                setTimeout(() => {
-                    button.textContent = 'Copiar';
-                }, 2000);
-            });
-        }
+      const searchBox = document.getElementById("searchBox");
+      const toolsList = document.getElementById("toolsList");
+      const noResults = document.getElementById("noResults");
+      const toolCards = document.querySelectorAll(".tool-card");
 
-        window.onscroll = function() {
-            const scrollTop = document.getElementById('scrollTop');
-            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
-                scrollTop.style.display = 'flex';
-            } else {
-                scrollTop.style.display = 'none';
-            }
-        };
+      searchBox.addEventListener("input", (e) => {
+        const searchTerm = e.target.value.toLowerCase().trim();
+        let visibleCount = 0;
 
-        function scrollToTop() {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
+        toolCards.forEach((card) => {
+          const searchData = card.getAttribute("data-name");
+          const matches = searchData.includes(searchTerm);
+
+          if (matches) {
+            card.style.display = "flex";
+            visibleCount++;
+          } else {
+            card.style.display = "none";
+          }
+        });
+
+        if (visibleCount === 0) {
+          noResults.style.display = "block";
+          toolsList.style.display = "none";
+        } else {
+          noResults.style.display = "none";
+          toolsList.style.display = "flex";
         }
+      });
     </script>
-</body>
+  </body>
 </html>
