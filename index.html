@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NMAP - Network Mapper</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(22, 27, 34, 0.8);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 255, 157, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #00ff9d;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            color: #00ff9d;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(0, 255, 157, 0.5);
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            color: #8b949e;
+        }
+
+        .objective {
+            background: linear-gradient(135deg, #1e3a4f 0%, #2d4a5f 100%);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #00ff9d;
+        }
+
+        .section {
+            margin-bottom: 35px;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #00d4ff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .subsection {
+            margin-bottom: 25px;
+        }
+
+        .subsection-title {
+            font-size: 1.2em;
+            color: #ffa500;
+            margin-bottom: 10px;
+            padding-left: 10px;
+            border-left: 3px solid #ffa500;
+        }
+
+        .code-block {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-block code {
+            color: #00ff9d;
+        }
+
+        .code-block .comment {
+            color: #8b949e;
+            font-style: italic;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #238636;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .code-block:hover .copy-btn {
+            opacity: 1;
+        }
+
+        .copy-btn:hover {
+            background: #2ea043;
+        }
+
+        .tip {
+            background: rgba(255, 165, 0, 0.1);
+            border-left: 4px solid #ffa500;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .tip strong {
+            color: #ffa500;
+        }
+
+        .nav {
+            position: sticky;
+            top: 20px;
+            background: rgba(13, 17, 23, 0.95);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #30363d;
+        }
+
+        .nav a {
+            color: #58a6ff;
+            text-decoration: none;
+            display: block;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background 0.3s;
+            font-size: 0.95em;
+        }
+
+        .nav a:hover {
+            background: rgba(88, 166, 255, 0.1);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .card {
+            background: rgba(13, 17, 23, 0.6);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 255, 157, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .section-title {
+                font-size: 1.5em;
+            }
+        }
+
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #00ff9d;
+            color: #0f0f23;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.5em;
+            box-shadow: 0 4px 12px rgba(0, 255, 157, 0.4);
+            transition: all 0.3s;
+        }
+
+        .scroll-top:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 NMAP</h1>
+            <p class="subtitle">Network Mapper - Escáner de Red y Auditoría de Seguridad</p>
+        </div>
+
+        <div class="objective">
+            <h3>🔍 Objetivo Principal</h3>
+            <p>NMAP permite identificar hosts activos, puertos abiertos, servicios en ejecución y posibles vulnerabilidades en una red. Es la herramienta esencial para reconocimiento y mapeo de infraestructuras.</p>
+        </div>
+
+        <div class="section" id="puertos">
+            <h2 class="section-title">📡 Escaneos de Puertos</h2>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">Escaneo SYN (Sigiloso)</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>nmap -sS &lt;target&gt;</code>
+                </div>
+                <p>Detecta puertos abiertos/cerrados sin completar el handshake TCP. Rápido y menos detectable.</p>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Escaneo de puerto específico</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>nmap -p 80 &lt;target&gt;<br>
+nmap -p 80,443,8080 &lt;target&gt;<br>
+nmap -p 1-1000 &lt;target&gt;<br>
+nmap -p- &lt;target&gt;  <span class="comment"># Todos los puertos</span></code>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Ver razón del estado del puerto</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>nmap --reason &lt;target&gt;</code>
+                </div>
+                <p>Muestra por qué NMAP determinó que un puerto está abierto, cerrado o filtrado.</p>
+            </div>
+        </div>
+
+        <div class="section" id="optimizacion">
+            <h2 class="section-title">⚡ Optimización de Escaneo</h2>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3 class="subsection-title">Deshabilitar ping ICMP</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        <code>nmap -Pn &lt;target&gt;</code>
+                    </div>
+                    <p>Asume que el host está activo, útil cuando el firewall bloquea ICMP.</p>
+                </div>
+
+                <div class="card">
+                    <h3 class="subsection-title">Anular resolución DNS</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        <code>nmap -n &lt;target&gt;</code>
+                    </div>
+                    <p>No resuelve nombres de dominio, acelera el escaneo.</p>
+                </div>
+
+                <div class="card">
+                    <h3 class="subsection-title">Deshabilitar ARP ping</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        <code>nmap --disable-arp-ping &lt;target&gt;</code>
+                    </div>
+                    <p>Útil en redes donde ARP está filtrado.</p>
+                </div>
+
+                <div class="card">
+                    <h3 class="subsection-title">Velocidad de escaneo</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        <code>nmap -T5 &lt;target&gt;</code>
+                    </div>
+                    <p>Plantillas de tiempo: T0 (paranoico) a T5 (insano). T5 es agresivo y genera mucho ruido.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="servicios">
+            <h2 class="section-title">🔎 Detección de Servicios y Versiones</h2>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">Detectar versiones de servicios</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>nmap -sV &lt;target&gt;</code>
+                </div>
+                <p>Identifica versión exacta del software corriendo en puertos abiertos.</p>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Detección de OS</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>nmap -O &lt;target&gt;</code>
+                </div>
+                <p>Intenta identificar el sistema operativo del objetivo.</p>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Escaneo agresivo (completo)</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>nmap -A &lt;target&gt;</code>
+                </div>
+                <p>Combina -sV, -O, scripts y traceroute.</p>
+            </div>
+        </div>
+
+        <div class="section" id="paquetes">
+            <h2 class="section-title">📦 Análisis de Paquetes</h2>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">Traza de paquetes</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>nmap --packet-trace &lt;target&gt;</code>
+                </div>
+                <p>Muestra cada paquete enviado y recibido durante el escaneo.</p>
+            </div>
+        </div>
+
+        <div class="section" id="evasion">
+            <h2 class="section-title">🛡️ Evasión de Firewalls</h2>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">Flag ACK para evasión</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>nmap -sA &lt;target&gt;</code>
+                </div>
+                <p>Envía paquetes con flag ACK para identificar reglas de firewall.</p>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Decoys (IPs señuelo)</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>nmap -D RND:5 &lt;target&gt;<br><br>
+nmap -D 192.168.1.5,192.168.1.10,ME &lt;target&gt;</code>
+                </div>
+                <p>Enmascara tu IP real generando IPs aleatorias como señuelo.</p>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Cambiar puerto origen</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>nmap --source-port 53 &lt;target&gt;<br>
+nmap -g 80 &lt;target&gt;</code>
+                </div>
+                <p>Útil cuando firewalls permiten tráfico desde puertos específicos (DNS:53, HTTP:80).</p>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Fragmentación de paquetes</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>nmap -f &lt;target&gt;</code>
+                </div>
+                <p>Divide paquetes para evadir IDS/IPS.</p>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">MTU personalizado</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>nmap --mtu 16 &lt;target&gt;</code>
+                </div>
+                <p>Define tamaño de fragmentación (múltiplo de 8).</p>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Spoofing de MAC</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>nmap --spoof-mac 0 &lt;target&gt;</code>
+                </div>
+                <p>Genera MAC aleatoria. También acepta MAC específica o vendor.</p>
+            </div>
+        </div>
+
+        <div class="section" id="scripts">
+            <h2 class="section-title">📜 Scripts NSE (Nmap Scripting Engine)</h2>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">Scripts por defecto</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>nmap -sC &lt;target&gt;</code>
+                </div>
+                <p>Ejecuta scripts seguros y útiles para detección común.</p>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Detección de vulnerabilidades</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>nmap --script vuln &lt;target&gt;</code>
+                </div>
+                <p>Busca vulnerabilidades conocidas (CVEs).</p>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Script específico</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>nmap --script http-title &lt;target&gt;</code>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Múltiples scripts</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>nmap --script "http-*" &lt;target&gt;</code>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Categorías de scripts</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>nmap --script auth &lt;target&gt;       <span class="comment"># Autenticación</span><br>
+nmap --script brute &lt;target&gt;      <span class="comment"># Fuerza bruta</span><br>
+nmap --script discovery &lt;target&gt;  <span class="comment"># Descubrimiento</span><br>
+nmap --script exploit &lt;target&gt;    <span class="comment"># Exploits</span></code>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="exportacion">
+            <h2 class="section-title">📤 Exportación de Resultados</h2>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3 class="subsection-title">Formato XML</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        <code>nmap -oX scan.xml &lt;target&gt;</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="subsection-title">Formato normal</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        <code>nmap -oN scan.txt &lt;target&gt;</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="subsection-title">Formato grepable</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        <code>nmap -oG scan.gnmap &lt;target&gt;</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="subsection-title">Todos los formatos</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                        <code>nmap -oA scan_completo &lt;target&gt;</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="combinaciones">
+            <h2 class="section-title">🔥 Combinaciones Útiles</h2>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">Escaneo completo sigiloso</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>nmap -sS -sV -O -p- --script vuln -oA scan_full &lt;target&gt;</code>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Escaneo rápido y agresivo</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>nmap -T4 -A -p- &lt;target&gt;</code>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Escaneo evasivo completo</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>nmap -sS -Pn -n --disable-arp-ping -D RND:10 --source-port 53 -f --data-length 25 &lt;target&gt;</code>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Escaneo de red con hosts activos</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>nmap -sn 192.168.1.0/24</code>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="tproc">
+            <h2 class="section-title">🎨 TPROC - Conversión XML a HTML</h2>
+            
+            <div class="subsection">
+                <p><strong>Convierte reportes XML de NMAP en páginas HTML visuales.</strong></p>
+                
+                <h3 class="subsection-title">Instalación</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>git clone https://github.com/honze-net/nmap-bootstrap-xsl</code>
+                </div>
+
+                <h3 class="subsection-title">Uso</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    <code>xsltproc nmap-bootstrap.xsl scan.xml -o scan.html</code>
+                </div>
+                <p>Genera un reporte HTML responsivo y elegante con toda la información del escaneo NMAP.</p>
+            </div>
+        </div>
+
+        <div class="tip">
+            <strong>💡 Tip:</strong> Combina múltiples técnicas de evasión para pruebas de penetración realistas y siempre verifica que tengas autorización antes de escanear.
+        </div>
+    </div>
+
+    <div class="scroll-top" id="scrollTop" onclick="scrollToTop()">↑</div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.parentElement;
+            const code = codeBlock.querySelector('code').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = '✓ Copiado';
+                setTimeout(() => {
+                    button.textContent = 'Copiar';
+                }, 2000);
+            });
+        }
+
+        window.onscroll = function() {
+            const scrollTop = document.getElementById('scrollTop');
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                scrollTop.style.display = 'flex';
+            } else {
+                scrollTop.style.display = 'none';
+            }
+        };
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+    </script>
+</body>
+</html>
